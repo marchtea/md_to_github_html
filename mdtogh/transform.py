@@ -15,13 +15,19 @@ import shutil
 import codecs
 import json
 
-def transform(paths = None, cache_path = None, system_css = False, css = False, abscss = False, gfm = False, username = None, password = None, needtoc = True, toc_depth = None, toc_file = None, book = '', offline = False, encoding = 'utf-8', refresh = False, file_reg = None, template_path = None, timeout = 20):
+def transform(paths = None, cache_path = None, system_css = False, css = False, abscss = False, gfm = False,
+              username = None, password = None, needtoc = True, toc_depth = None, toc_file = None, book = '',
+              offline = False, encoding = 'utf-8', refresh = False, file_reg = None, template_path = None,
+              timeout = 20, replace_dict = None):
 
     #first, initial enviroment for jinjia2
     init_env(template_path)
 
     if len(paths) == 0:
         paths = ['.']
+
+    if replace_dict is None:
+        replace_dict = {}
 
     #Get style file
     styles, style_paths = get_style(cache_path, system_css, refresh)
@@ -124,6 +130,10 @@ def transform(paths = None, cache_path = None, system_css = False, css = False, 
             book_index = render_index(bookinfo['title'], bookinfo['coverimage'], bookinfo['description'], rtoc, True if toc_file else False)
         else:
             book_index = render_index('', '', '', rtoc, True if toc_file else False)
+
+        for match, replacement in replace_dict.iteritems():
+            book_index = book_index.replace(match, replacement)
+
         with open('index.html', 'w') as f:
             f.write(book_index.encode('utf-8'))
     else:
@@ -135,6 +145,10 @@ def transform(paths = None, cache_path = None, system_css = False, css = False, 
         n = contents[i + 1][0] if i + 1 != len(contents) else None
 
         rendered = render_with_template('', contents[i][1], rtoc, p, n, css, abscss, needtoc, styles, style_paths)
+
+        for match, replacement in replace_dict.iteritems():
+            rendered = rendered.replace(match, replacement)
+
         with open(contents[i][0], 'w') as f:
             f.write(rendered.encode('utf-8'))
 
