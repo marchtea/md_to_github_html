@@ -22,6 +22,7 @@ mdtogh can **convert** your md files into html files like github does with featu
 * offline renderer
 * proxy support(respect https\_proxy environment variable)
 * cache support
+* do replacements in produced html documents
 
 ##demo
 
@@ -104,6 +105,10 @@ Offline rendering:
 **Recommanded** options to generate `several files`:
 
 	$ mdtogh 01.md 02.md
+	
+options to do replacements in the generated files:
+
+	$ mdtogh --replace @@version@@,v1.2.3 01.md 
 
 For more options:
 
